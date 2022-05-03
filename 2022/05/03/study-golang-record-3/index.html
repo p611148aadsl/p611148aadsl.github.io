@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta name="description" content="CrossTime的个人博客" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title> CrossTime的个人博客</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css"
+      />
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    </head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-study-golang-record-3"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+     
+    <div class="article-meta">
+      <a href="/2022/05/03/study-golang-record-3/" class="article-date">
+  <time datetime="2022-05-03T09:14:59.518Z" itemprop="datePublished">2022-05-03</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">4.1k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">17 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Golang学习记录之三"><a href="#Golang学习记录之三" class="headerlink" title="Golang学习记录之三"></a>Golang学习记录之三</h1><p>​    golang开发的的又一篇补充，比之前多了3条，懒得开新的，索性合并一起了 （＞人＜；）</p>
+<h2 id="1、创建configure的结构体"><a href="#1、创建configure的结构体" class="headerlink" title="1、创建configure的结构体"></a>1、创建configure的结构体</h2><p>如果程序有配置信息需要存储，可以定义一个构造函数返回</p>
+<p>结合sync.Once变量定义一个构造函数来存储配置，示例代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> conf</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> once sync.Once</span><br><span class="line"><span class="comment">// Config类型为用户自己定义的存储配置的结构体，config为变量</span></span><br><span class="line"><span class="keyword">var</span> config *Config</span><br><span class="line"></span><br><span class="line"><span class="comment">// config一次性定义</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Instance</span><span class="params">()</span></span> *Config &#123;</span><br><span class="line">    <span class="comment">// once 为sync.Once类型，参数为函数，用于给全局变量config赋值</span></span><br><span class="line">    <span class="comment">// sync.Once的作用在于只执行一次，如果第二次调用Instance函数，则直接返回config变量</span></span><br><span class="line">    once.Do(<span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        config = &amp;Config&#123;&#125;</span><br><span class="line">        <span class="comment">// 比如配置里有一项线程数，默认为10</span></span><br><span class="line">        config.ThreadNum = <span class="number">10</span></span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">return</span> config</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 其他package调用方式，第一次调用会执行func()里的赋值语句，第二次直接返回config</span></span><br><span class="line">conf.Instance().ThreadNum</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="2、获取变量的类型"><a href="#2、获取变量的类型" class="headerlink" title="2、获取变量的类型"></a>2、获取变量的类型</h2><p>如果某个函数的入参是interface{}，有下面几种方式可以获取入参的方法</p>
+<p><strong>1）fmt</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    v := <span class="string">&quot;hello world&quot;</span></span><br><span class="line">    fmt.Println(typeof(v))</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">typeof</span><span class="params">(v <span class="keyword">interface</span>&#123;&#125;)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> fmt.Sprintf(<span class="string">&quot;%T&quot;</span>, v)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行结果：</span></span><br><span class="line"><span class="type">string</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>2）反射</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;reflect&quot;</span></span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    v := <span class="string">&quot;hello world&quot;</span></span><br><span class="line">    fmt.Println(typeof(v))</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">typeof</span><span class="params">(v <span class="keyword">interface</span>&#123;&#125;)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> reflect.TypeOf(v).String()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行结果：</span></span><br><span class="line"><span class="type">string</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>3）类型断言</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    v := <span class="string">&quot;hello world&quot;</span></span><br><span class="line">    fmt.Println(typeof(v))</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">typeof</span><span class="params">(v <span class="keyword">interface</span>&#123;&#125;)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> t := v.(<span class="keyword">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">int</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;int&quot;</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">float64</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;float64&quot;</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">string</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;string&quot;</span></span><br><span class="line">    <span class="comment">//... etc</span></span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        _ = t</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;unknown&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行结果：</span></span><br><span class="line"><span class="type">string</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3、rune"><a href="#3、rune" class="headerlink" title="3、rune"></a>3、rune</h2><p> []rune(s), 它可以将字符串转化成 unicode 码点</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 与byte区别</span></span><br><span class="line">first := <span class="string">&quot;fisrt&quot;</span></span><br><span class="line">fmt.Println([]<span class="type">rune</span>(first))</span><br><span class="line">fmt.Println([]<span class="type">byte</span>(first))</span><br><span class="line"></span><br><span class="line">[<span class="number">102</span> <span class="number">105</span> <span class="number">115</span> <span class="number">114</span> <span class="number">116</span>] <span class="comment">// 输出结果 [] rune</span></span><br><span class="line">[<span class="number">102</span> <span class="number">105</span> <span class="number">115</span> <span class="number">114</span> <span class="number">116</span>] <span class="comment">// 输出结果 [] byte</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// byte is an alias for uint8 and is equivalent to uint8 in all ways. It is</span></span><br><span class="line"><span class="comment">// used, by convention, to distinguish byte values from 8-bit unsigned</span></span><br><span class="line"><span class="comment">// integer values.</span></span><br><span class="line"><span class="keyword">type</span> <span class="type">byte</span> = <span class="type">uint8</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// rune is an alias for int32 and is equivalent to int32 in all ways. It is</span></span><br><span class="line"><span class="comment">// used, by convention, to distinguish character values from integer values.</span></span><br><span class="line"><span class="keyword">type</span> <span class="type">rune</span> = <span class="type">int32</span></span><br><span class="line"><span class="comment">// 原来是 byte 表示一个字节，rune 表示四个字节</span></span><br></pre></td></tr></table></figure>
+
+<p>在中文字符串截取方面，使用rune截取</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">s := <span class="string">&quot;今天天气真好&quot;</span></span><br><span class="line">res := []<span class="type">rune</span>(s)</span><br><span class="line">fmt.Println(<span class="type">string</span>(res[:<span class="number">2</span>]))</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行结果：</span></span><br><span class="line">今天   <span class="comment">// 顺利截取了</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="4、强制类型转换"><a href="#4、强制类型转换" class="headerlink" title="4、强制类型转换"></a>4、强制类型转换</h2><p>类型断言是一个使用在接口值上的操作。语法上它看起来像 i.(T) 被称为断言类型，这里 i 表示一个接口的类型和 T 表示一个类型一个类型断言检查它操作对象的动态类型是否和断言的类型匹配</p>
+<p>类型断言的基本格式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">t := i.(T)</span><br><span class="line"><span class="comment">// 其中，i 代表接口变量，T 代表转换的目标类型，t 代表转换后的变量</span></span><br></pre></td></tr></table></figure>
+
+<p>这里有两种可能。第一种，如果断言的类型 T 是一个具体类型，然后类型断言检查 i 的动态类型是否和 T 相同。如果这个检查成功了，类型断言的结果是 i 的动态值，当然它的类型是 T。换句话说，具体类型的类型断言从它的操作对象中获得具体的值。如果检查失败，接下来这个操作会抛出 panic</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> w io.Writer</span><br><span class="line">w = os.Stdout</span><br><span class="line">rw := w.(io.ReadWriter) <span class="comment">// 成功：*os.file具有读写功能</span></span><br><span class="line">w = <span class="built_in">new</span>(bytes.Reader)</span><br><span class="line">rw = w.(io.ReadWriter) <span class="comment">// 死机：*bytes.Reader没有读取方法</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行结果：</span></span><br><span class="line">./test.<span class="keyword">go</span>:<span class="number">204</span>:<span class="number">4</span>: cannot use <span class="built_in">new</span>(bytes.Reader) (<span class="keyword">type</span> *bytes.Reader) as <span class="keyword">type</span> io.Writer in assignment:</span><br><span class="line">      *bytes.Reader does not implement io.Writer (missing Write method)   <span class="comment">// 缺失write方法</span></span><br></pre></td></tr></table></figure>
+
+<p>如果 i 没有完全实现 T 接口的方法，这个语句将会触发宕机。触发宕机不是很友好，因此上面的语句还有一种写法</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">t,ok := i.(T)</span><br><span class="line"><span class="keyword">if</span> ok &#123;</span><br><span class="line">    <span class="comment">// 转换成功</span></span><br><span class="line">    ...</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 转换失败</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法下，如果发生接口未实现时，将会把 ok 置为 false，t 置为 T 类型的 0 值。正常实现时，ok 为 true</p>
+<p>这里 ok 可以被认为是：i 接口是否实现 T 类型的结果</p>
+<h2 id="5、golang变量的默认值"><a href="#5、golang变量的默认值" class="headerlink" title="5、golang变量的默认值"></a>5、golang变量的默认值</h2><p>Go语言将数据类型分为四类：基础类型、复合类型、引用类型和接口类型</p>
+<h4 id="1-基础类型"><a href="#1-基础类型" class="headerlink" title="1) 基础类型"></a>1) 基础类型</h4><p><strong>整形</strong></p>
+<p>有符号整形 int8 int16 int32 int64 默认值 0</p>
+<p>无符号整形 uint8 uint16 uint32 uint64 默认值 0</p>
+<p>特殊整形 int uint byte rune uintptr 默认值 0</p>
+<p><strong>浮点型</strong></p>
+<p>浮点型数 float32 float64 默认值 0.0</p>
+<p>复数类型 complex64 complex128 默认值 0+0i</p>
+<p>布尔类型 true false 默认值 false</p>
+<p>字符串类型 string 默认值 “”</p>
+<p><strong>复合类型</strong></p>
+<p>数组类型 [SIZE]TYPE 默认值根据数组类型变化而变化 如 [3]int 为 [0,0,0]</p>
+<p>结构体类型 struct 默认值根据随结构体内部类型变化而变化，如下默认值为{ 0} 即 Name为”” Age为0</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line"> 	Name <span class="type">string</span></span><br><span class="line"> 	Age  <span class="type">int</span></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>引用类型</strong></p>
+<p>指针 *TYPE 默认值 nil</p>
+<p>切片 []TYPE 默认值 nil</p>
+<p>字典 map 默认值 nil</p>
+<p>通道 chan 默认值 nil</p>
+<p>函数 func 默认值 nil</p>
+<p><strong>接口类型</strong></p>
+<p>接口 interface 默认值 nil</p>
+<p>这里要特别注意 nil</p>
+<p>在 Go 中不同类型的 nil 是无法比较的，他们的大小也不一样</p>
+<p>引用类型中的 slice map chan 要使用 make 函数初始化，如果常规 var NAME TYPE 的方式声明，将不能通过正常的赋值方法来修改默认值</p>
+<h2 id="6、import"><a href="#6、import" class="headerlink" title="6、import"></a>6、import</h2><p>import 下划线（如：import _ hello&#x2F;imp）的作用：当导入一个包时，该包下的文件里所有init()函数都会被执行，然而，有些时候我们并不需要把整个包都导入进来，仅仅是是希望它执行init()函数而已。这个时候就可以使用 import _ 引用该包。即使用 import _ 包路径 只是引用该包，仅仅是为了调用init()函数，所以无法通过包名来调用包中的其他函数，示例代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 目录结构：</span></span><br><span class="line"><span class="comment">// - test1</span></span><br><span class="line"><span class="comment">//   - test1.go</span></span><br><span class="line"><span class="comment">// - test2</span></span><br><span class="line"><span class="comment">//   - test2.go</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// test1.go</span></span><br><span class="line"><span class="keyword">package</span> test1</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;import test1 success&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Test</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;for test&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// test1.go</span></span><br><span class="line"><span class="keyword">package</span> test2</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123;</span><br><span class="line">    _ <span class="string">&quot;test1&quot;</span>   <span class="comment">// golang的import可以给引入的package设置别名（为了防止有重名package的情况），别名可以为下划线</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">run</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// _.Test() 会报错，无法通过下划线来调用模块内的函数</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;done&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行结果：</span></span><br><span class="line"><span class="keyword">import</span> test1 success</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="7、无限缓存的channel"><a href="#7、无限缓存的channel" class="headerlink" title="7、无限缓存的channel"></a>7、无限缓存的channel</h2><p>一般再定义channel时是没有缓存的，即通道channel内只有1个变量，如果没有取出变量则会堵塞</p>
+<p>可以在定义channel时设置缓存长度，但也是有限的，如果达到容量上限，也会造成堵塞，如果我们不想堵塞的话只能手动</p>
+<p>经过网上搜索，找到一个定义了无限容量缓存结构体的channel：<a target="_blank" rel="noopener" href="https://github.com/smallnest/chanx">https://github.com/smallnest/chanx</a></p>
+<p>这个库的原理是定义了一个环形数组ringbuffer，将读完的数据直接覆盖；当缓存长度达到数组长度时再自动创建更大容量的数组，可以减少底层复制的次数，提高效率</p>
+<h2 id="8、C语言中数据类型与go中的数据类型的对应关系"><a href="#8、C语言中数据类型与go中的数据类型的对应关系" class="headerlink" title="8、C语言中数据类型与go中的数据类型的对应关系"></a>8、C语言中数据类型与go中的数据类型的对应关系</h2><p>左为C语言数据类型，右为golang数据类型（golang重写一些C语言项目时可能会用到）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> (</span><br><span class="line">	BOOL          <span class="type">uint32</span></span><br><span class="line">	BOOLEAN       <span class="type">byte</span></span><br><span class="line">	BYTE          <span class="type">byte</span></span><br><span class="line">	DWORD         <span class="type">uint32</span></span><br><span class="line">	DWORD64       <span class="type">uint64</span></span><br><span class="line">	HANDLE        <span class="type">uintptr</span></span><br><span class="line">	HLOCAL        <span class="type">uintptr</span></span><br><span class="line">	LARGE_INTEGER <span class="type">int64</span></span><br><span class="line">	LONG          <span class="type">int32</span></span><br><span class="line">	LPVOID        <span class="type">uintptr</span></span><br><span class="line">	SIZE_T        <span class="type">uintptr</span></span><br><span class="line">	UINT          <span class="type">uint32</span></span><br><span class="line">	ULONG_PTR     <span class="type">uintptr</span></span><br><span class="line">	ULONGLONG     <span class="type">uint64</span></span><br><span class="line">	WORD          <span class="type">uint16</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="9、golang编译信息"><a href="#9、golang编译信息" class="headerlink" title="9、golang编译信息"></a>9、golang编译信息</h2><p>golang编译器在编译程序时会自动加入编译信息，根据这些编译信息可以使用ida结合脚本将函数名恢复出来</p>
+<p>脚本地址：<a target="_blank" rel="noopener" href="https://github.com/strazzere/golang_loader_assist">https://github.com/strazzere/golang_loader_assist</a></p>
+<p>ps：使用脚本的时候注意区分ida和python版本，对号入座</p>
+<p>以上脚本仅支持golang1.15及以下编译的程序，golang1.16版本之后对编译方式进行了修改，上面的脚本不再适用</p>
+<p>使用后面链接里的脚本即可，注意需要自己修改起始地址：<a target="_blank" rel="noopener" href="http://f5.pm/go-77540.html">http://f5.pm/go-77540.html</a></p>
+<p>如果嫌编译信息多余，可以使用以下命令可以去掉多余的编译信息</p>
+<p>go build -v -a -ldflags&#x3D;”-w -s” -trimpath</p>
+<p>如果不想让别人恢复出来函数名等信息，可以对二进制程序进行混淆，我一般使用名为garble的第三方库：github.com&#x2F;burrowers&#x2F;garble</p>
+<p>即使使用了上面的脚本，恢复出来的函数名也是经过混淆的</p>
+<h2 id="10、unsafe包"><a href="#10、unsafe包" class="headerlink" title="10、unsafe包"></a>10、unsafe包</h2><p>在unsafe包官方定义里有四个描述：</p>
+<p>1、任何类型的指针都可以被转化为Pointer</p>
+<p>2、Pointer可以被转化为任何类型的指针</p>
+<p>3、uintptr可以被转化为Pointer</p>
+<p>4、Pointer可以被转化为uintptr</p>
+<p>指向不同类型数据的指针，是无法直接相互转换的，必须借助unsafe.Pointer(类似于C的 void指针)代理一下再转换也就是利用上述的1，2规则</p>
+<p>为什么字符串类型的 unsafe.Sizeof() 一直是16呢？</p>
+<p>实际上字符串类型对应一个结构体，该结构体有两个域，第一个域是指向该字符串的指针，第二个域是字符串的长度，每个域占8个字节，但是并不包含指针指向的字符串的内容，这也就是为什么sizeof始终返回的是16。</p>
+<p>组成可以理解成此结构体</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">typedef <span class="keyword">struct</span> &#123;</span><br><span class="line">    char* buffer;</span><br><span class="line">    size_tlen;</span><br><span class="line"> &#125; <span class="type">string</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在红队的木马程序中经常会用到unsafe，现在也还没琢磨明白（〒▽〒）</p>
+<p>这里先抛个砖，后续琢磨明白了再单独开一篇进行讲述</p>
+<h2 id="11、golang实现python的yield生成器"><a href="#11、golang实现python的yield生成器" class="headerlink" title="11、golang实现python的yield生成器"></a>11、golang实现python的yield生成器</h2><p>主要原理是使用channel通道实现，示例代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">someGenerator</span><span class="params">()</span></span> <span class="keyword">chan</span> <span class="type">string</span> &#123;</span><br><span class="line">	channel := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">string</span>)</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;                            <span class="comment">// 使用协程输入数据</span></span><br><span class="line">		channel &lt;- <span class="string">&quot;a&quot;</span>                     <span class="comment">// 向channel输入数据，该操作会堵塞直到main中的channel读取</span></span><br><span class="line">		fmt.Println(<span class="string">&quot;yield&quot;</span>, &lt;-channel)    <span class="comment">// 等待main的信号</span></span><br><span class="line">		fmt.Println(<span class="string">&quot;after a&quot;</span>)</span><br><span class="line">		channel &lt;- <span class="string">&quot;c&quot;</span>                     <span class="comment">// 输入下一个数据</span></span><br><span class="line">		fmt.Println(<span class="string">&quot;yield&quot;</span>, &lt;-channel)</span><br><span class="line">		fmt.Println(<span class="string">&quot;after c&quot;</span>)</span><br><span class="line">		channel &lt;- <span class="string">&quot;b&quot;</span></span><br><span class="line">		fmt.Println(<span class="string">&quot;yield&quot;</span>, &lt;-channel)</span><br><span class="line">		fmt.Println(<span class="string">&quot;after b&quot;</span>)</span><br><span class="line">		<span class="built_in">close</span>(channel)                     <span class="comment">// 关闭通道，让main中的循环退出</span></span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="keyword">return</span> channel</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	channel := someGenerator()</span><br><span class="line">	<span class="keyword">for</span> val := <span class="keyword">range</span> channel &#123;       <span class="comment">// 读取数据，直到channel close</span></span><br><span class="line">		fmt.Println(<span class="string">&quot;main&quot;</span>, val)     <span class="comment">// 输出从协程输入到channel的数据</span></span><br><span class="line">		channel &lt;- <span class="string">&quot;2&quot;</span>               <span class="comment">// 发送信号，让协程插入下一个数据</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="12、gopls"><a href="#12、gopls" class="headerlink" title="12、gopls"></a>12、gopls</h2><p>gopls 实现了 VS Code 的 Language Server Protocol (LSP，即语言服务器协议，定义了在编辑器或 IDE 中与语言服务器之间使用的协议，该语言服务器提供诸如自动完成，转到定义，查找所有引用等语言功能)，本人使用vscode server进行golang开发，gopls能够自动补全函数和变量，转到函数定义，查找引用，十分方便</p>
+<p>但是在某些场景下，使用vscode server+gopls开发golang会使服务器的cpu爆炸。。。 (* ￣︿￣)</p>
+<p>有一天，我想把一个静态文件需要写到二进制程序里，由于只有一个文件，懒得用embed打包静态资源了，就想着把byte形式写入到文件里</p>
+<p>但如果特别长的byte数组写到代码里（长度约178w。。），在进行后续代码修改时，gopls会占用超多内存和cpu性能，机器直接爆炸而卡死，我的4核8G服务器几度差点宕机。。</p>
+<p>但是我之前使用felix将前端静态文件打包进二进制就没啥事，那些静态文件也不比我这个的小。。（不知道啥是felix的详见上一篇文章—golang开发之二的第7条）</p>
+<p>经过一顿分析，发现人家使用的是字符串，还经过了gzip压缩；我这使用的是byte数组，直接由整个静态文件转换得来。。</p>
+<p>由此，找到解决办法：将byte数组的内容使用gzip压缩，再以string的形式存储就OK了，压缩以后的string长度为45w</p>
+<p>压缩代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">fw, err := os.Create(<span class="string">&quot;demo.gzip&quot;</span>) <span class="comment">// 创建gzip包文件，返回*io.Writer</span></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Fatalln(err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">defer</span> fw.Close()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实例化心得gzip.Writer</span></span><br><span class="line">gw, _ := gzip.NewWriterLevel(fw, <span class="number">9</span>)</span><br><span class="line"><span class="keyword">defer</span> gw.Close()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取要打包的文件信息</span></span><br><span class="line">fr, err := os.Open(<span class="string">&quot;1122.html&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Fatalln(err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">defer</span> fr.Close()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取文件头信息</span></span><br><span class="line">fi, err := fr.Stat()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Fatalln(err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建gzip.Header</span></span><br><span class="line">gw.Header.Name = fi.Name()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取文件数据</span></span><br><span class="line">buf := <span class="built_in">make</span>([]<span class="type">byte</span>, fi.Size())</span><br><span class="line">_, err = fr.Read(buf)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Fatalln(err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写入数据到zip包</span></span><br><span class="line">_, err = gw.Write(buf)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Fatalln(err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 读取gzip文件输出成string</span></span><br><span class="line">f, _ := ioutil.ReadFile(<span class="string">&quot;demo.gzip&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> _, b := <span class="keyword">range</span> f &#123;</span><br><span class="line">    fmt.Print(<span class="type">int</span>(b), <span class="string">&quot;,&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将上面的gzip以int的string形式存储到代码里，如下</p>
+<p><img src="/2022/05/03/study-golang-record-3/clipboard.png" alt="生成的string"></p>
+<p>解压代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">buff := []<span class="type">byte</span>&#123;&#125;</span><br><span class="line">temp := strings.Split(zipData, <span class="string">&quot;,&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> _, b := <span class="keyword">range</span> temp &#123;</span><br><span class="line">    i, _ := strconv.Atoi(b)</span><br><span class="line">    buff = <span class="built_in">append</span>(buff, <span class="type">byte</span>(i))</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// w.htmlFile为文件名称</span></span><br><span class="line">w.htmlOutputFile, err = os.Create(w.htmlFile)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    util.Error(fmt.Sprintf(<span class="string">&quot;could not create %s. please check&quot;</span>, w.htmlFile))</span><br><span class="line">    w.htmlFile = <span class="string">&quot;&quot;</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    gr, err := gzip.NewReader(bytes.NewReader(buff)))</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        util.Error(<span class="string">&quot;could not decompress html templete zipData&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> gr.Close()</span><br><span class="line">    buff := <span class="built_in">make</span>([]<span class="type">byte</span>, <span class="number">1024</span>*<span class="number">1024</span>*<span class="number">2</span>)</span><br><span class="line">    <span class="keyword">for</span> &#123;</span><br><span class="line">        n, _ := gr.Read(buff)</span><br><span class="line">        <span class="keyword">if</span> n == <span class="number">0</span> &#123;</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        &#125;</span><br><span class="line">        _, err = w.htmlOutputFile.Write(buff[:n])</span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            util.Error(fmt.Sprintf(<span class="string">&quot;could not write basic html into %s. please check&quot;</span>, w.htmlFile))</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>cpu和内存没有爆炸O(∩_∩)O</p>
+<p>ps：gzip有默认的最大读取长度，最长读取32768，当单个文件大小过大时，需要循环读取</p>
+<h2 id="13、golang-1-18—泛型"><a href="#13、golang-1-18—泛型" class="headerlink" title="13、golang 1.18—泛型"></a>13、golang 1.18—泛型</h2><p>golang 在不久之前更新了1.18版本，支持了新特性： 泛型(Generics)，详细介绍见官方参考文档：<a target="_blank" rel="noopener" href="https://go.dev/doc/tutorial/generics">https://go.dev/doc/tutorial/generics</a></p>
+<p>这里只进行简单记录</p>
+<p>在golang语法中，需要对每个函数参数的类型进行定义，而且只能定义一种类型，比如float，int中的一种，如果参数可能为float或int，则需要针对这两种类型写两个函数，如下所示：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 针对value为int类型写的函数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SumInts</span><span class="params">(m <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">int64</span>)</span></span> <span class="type">int64</span> &#123;</span><br><span class="line">	<span class="keyword">var</span> s <span class="type">int64</span></span><br><span class="line">	<span class="keyword">for</span> _, v := <span class="keyword">range</span> m &#123;</span><br><span class="line">		s += v</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> s</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 针对value为float类型写的函数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SumFloats</span><span class="params">(m <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">float64</span>)</span></span> <span class="type">float64</span> &#123;</span><br><span class="line">	<span class="keyword">var</span> s <span class="type">float64</span></span><br><span class="line">	<span class="keyword">for</span> _, v := <span class="keyword">range</span> m &#123;</span><br><span class="line">		s += v</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> s</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 初始化</span></span><br><span class="line">	ints := <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">int64</span>&#123;</span><br><span class="line">		<span class="string">&quot;first&quot;</span>:  <span class="number">34</span>,</span><br><span class="line">		<span class="string">&quot;second&quot;</span>: <span class="number">12</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 初始化</span></span><br><span class="line">	floats := <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">float64</span>&#123;</span><br><span class="line">		<span class="string">&quot;first&quot;</span>:  <span class="number">35.98</span>,</span><br><span class="line">		<span class="string">&quot;second&quot;</span>: <span class="number">26.99</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 调用函数</span></span><br><span class="line">	fmt.Printf(<span class="string">&quot;Non-Generic Sums: %v and %v\n&quot;</span>,</span><br><span class="line">		SumInts(ints),</span><br><span class="line">		SumFloats(floats))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用1.18版本中新定义的泛型，则可以只定义一个泛型函数，在调用时统一调用这个泛型函数即可</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// value可以为int64或是float64类型</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SumIntsOrFloats</span>[<span class="title">K</span> <span class="title">comparable</span>, <span class="title">V</span> <span class="title">int64</span> | <span class="title">float64</span>]<span class="params">(m <span class="keyword">map</span>[K]V)</span></span> V &#123;</span><br><span class="line">	<span class="keyword">var</span> s V</span><br><span class="line">	<span class="keyword">for</span> _, v := <span class="keyword">range</span> m &#123;</span><br><span class="line">		s += v</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> s</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Initialize a map for the integer values</span></span><br><span class="line">	ints := <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">int64</span>&#123;</span><br><span class="line">		<span class="string">&quot;first&quot;</span>:  <span class="number">34</span>,</span><br><span class="line">		<span class="string">&quot;second&quot;</span>: <span class="number">12</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Initialize a map for the float values</span></span><br><span class="line">	floats := <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">float64</span>&#123;</span><br><span class="line">		<span class="string">&quot;first&quot;</span>:  <span class="number">35.98</span>,</span><br><span class="line">		<span class="string">&quot;second&quot;</span>: <span class="number">26.99</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	fmt.Printf(<span class="string">&quot;Generic Sums: %v and %v\n&quot;</span>,</span><br><span class="line">		SumIntsOrFloats[<span class="type">string</span>, <span class="type">int64</span>](ints),</span><br><span class="line">		SumIntsOrFloats[<span class="type">string</span>, <span class="type">float64</span>](floats))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>SumIntsOrFloats</code>函数在函数名称后边的紧跟一个中括号<code>[K comparable, V int64 | float64]</code>的定义了两个泛型参数K和V, 表示将在函数定义中使用这两个泛型参数。 在中括号中同时为泛型参数K和V指定了类型约束:</p>
+<ul>
+<li>为泛型参数K指定的类型约束是<code>comparable</code>，comparable是Go语言内置的类型约束，它表示类型的值可以使用<code>==</code>和<code>!=</code>比较大小，这也是map类型的key要求的。</li>
+<li>为泛型参数V指定的类型约束是int64和float64两种类型的联合，<code>|</code>表示允许两者中的任何一个</li>
+</ul>
+<p>后边在函数的参数列表中将m参数的类型指定为<code>map[K]V</code>，因为在声明泛型参数时，已经为其指定了约束，例如<code>K</code>是<code>comparable</code>的，这样<code>map[K]V</code>才是一个有效的map类型，如果没有指定这个约束，编译器会报编译错误</p>
+<p>（ps：我暂时还没用过这个特性。。个人感觉这个特性可能以后会给二进制程序带来漏洞。。）</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://p611148aadsl.github.io/2022/05/03/study-golang-record-3/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2022/04/18/study-golang-record-2/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Golang学习记录之二</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2022
+        <i class="ri-heart-fill heart_icon"></i> CrossTime
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/crosstime.png" alt="CrossTime的个人博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+ 
+<script src="/js/clickLove.js"></script>
+ 
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
